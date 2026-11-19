@@ -42,8 +42,7 @@ struct QueueFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
     std::optional<uint32_t> presentFamily;
 
-    bool isComplete() {
-        return graphicsFamily.has_value() && presentFamily.has_value();
+    bool isComplete() {S
     }
 };
 
@@ -240,11 +239,32 @@ private:
         vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
     }
 
+	bool checkDeviceExtensionSupport(VkPhysicalDevice device) {
+		uint32_t enxtensionCount;
+		vkEnumerateDeviceExtensionProperties(deice, nullptr, $extensionCount, nullptr);
+		
+		std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+	
+		std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end()); 
+	
+		for(const auto& extension : availableExtensions) {
+			requiredExtensions.erase(extension.extensionName);
+		}
+	
+		std::cout << "Alfie is dumb";	
+		return requiredExtensions.empty();	
+}
+
     bool isDeviceSuitable(VkPhysicalDevice device) {
         QueueFamilyIndices indices = findQueueFamilies(device);
-
+       
         return indices.isComplete();
-    }
+	
+	const std::vector<cosnt char*> deviceExtensions = {
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME }; 
+}
+
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
         QueueFamilyIndices indices;
@@ -325,6 +345,9 @@ private:
 };
 
 int main() {
+	
+    std::cout << "TEST";    
+
     HelloTriangleApplication app;
 
     try {
@@ -335,4 +358,4 @@ int main() {
     }
 
     return EXIT_SUCCESS;
-
+}

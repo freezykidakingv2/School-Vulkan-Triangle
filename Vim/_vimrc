@@ -1,5 +1,9 @@
 " Vim with all enhancements
 source $VIMRUNTIME/vimrc_example.vim
+source $MYVIMRC
+
+set termguicolors
+set number
 
 " Use the internal diff if available.
 " Otherwise use the special 'diffexpr' for Windows.
@@ -38,4 +42,36 @@ function MyDiff()
     let &shellxquote=l:shxq_sav
   endif
 endfunction
+
+" ==========================
+" C++ COLOUR SCHEME
+" ==========================
+
+syntax enable
+filetype plugin indent on
+
+" Functions - Orange
+highlight Function ctermfg=208 guifg=#ff8800
+highlight link cFunction Function
+highlight link cppFunction Function
+
+" Variables - Purple
+highlight Identifier ctermfg=141 guifg=#bb86fc
+
+" Types - Green
+highlight Type ctermfg=46 guifg=#00ff00
+highlight link cType Type
+
+" Keywords - Blue
+highlight Statement ctermfg=33 guifg=#448aff
+highlight Conditional ctermfg=33 guifg=#448aff
+highlight Repeat ctermfg=33 guifg=#448aff
+highlight StorageClass ctermfg=33 guifg=#448aff
+
+" Strings - Yellow
+highlight String ctermfg=226 guifg=#ffff00
+highlight Character ctermfg=226 guifg=#ffff00
+
+" Comments - Grey
+highlight Comment ctermfg=8 guifg=#808080
 
