@@ -223,7 +223,8 @@ private:
 
         createInfo.pEnabledFeatures = &deviceFeatures;
 
-        createInfo.enabledExtensionCount = 0;
+	createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtension.size());
+        createInfo.ppEnabledExtensionNames = deviceExtension.data();	
 
         if (enableValidationLayers) {
             createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -241,17 +242,37 @@ private:
     }
 
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device) {
-		return true;	
+	
+		uint32_t extensionCount;
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extentionCount, nullptr);	
+		
+		std::vector<VkExtensionProperties> availabeExtentions(extensionCount);
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());	
+
+		std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+		
+		for (const auto& extension : availableExtensions) {
+			requiredExtensions.erase(extension.extensionName);	
+		}
+
+		return requiredExtensions.empty();
 	} 
 
     bool isDeviceSuitable(VkPhysicalDevice device) {
         QueueFamilyIndices indices = findQueueFamilies(device);
 
 	bool extensionsSupported = checkDeviceExtensionSupport(device);
+	
+	bool swapChainAdequate = false;
 
-	return indices.isComplete() && extensionsSupported; 
+	if (extensionsSupported) {
+		SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
+	swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+	}
 
+	return indices.isComplete() && extensionsSupported && swapChainAdequate; 
     }
+
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
         QueueFamilyIndices indices;
 
@@ -329,6 +350,32 @@ private:
         return VK_FALSE;
     }
 };
+
+SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
+
+	SwapChainSupportDetails details;
+	
+	vkGetPhysicalDeviceSurfaceCapabilitesKHR(device, surface, &details.capabilities);
+
+	uint32_t formatCount;
+	vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+
+	if (formatcount != 0) {
+		details.formats.resize(formatCount);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.format.data());	
+	}
+	
+	uint32_t presentModeCount;
+	vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
+
+	if (presentModeCount != 0) {
+	
+		details.presentMode.resize(presentModeCount);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, $presentModeCount, details.presentModes.data();	
+	}
+
+	return details;
+}
 
 int main() {
     HelloTriangleApplication app;
