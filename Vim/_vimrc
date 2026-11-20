@@ -73,3 +73,24 @@ highlight Character ctermfg=226 guifg=#ffff00
 
 " Comments - Grey
 highlight Comment ctermfg=8 guifg=#808080
+
+" Additional C/C++ syntax groups
+
+" Variables and identifiers - Purple
+highlight cIdentifier ctermfg=141 guifg=#bb86fc
+highlight cppIdentifier ctermfg=141 guifg=#bb86fc
+
+" Constants - Purple
+highlight cConstant ctermfg=141 guifg=#bb86fc
+highlight cppConstant ctermfg=141 guifg=#bb86fc
+
+" User-defined types - Green
+highlight cUserType ctermfg=46 guifg=#00ff00
+highlight cppUserType ctermfg=46 guifg=#00ff00
+
+" C++ STL types - Green
+highlight cppSTLtype ctermfg=46 guifg=#00ff00
+
+" Functions - Orange
+highlight cUserFunction ctermfg=208 guifg=#ff8800
+highlight cppSTLfunction ctermfg=208 guifg=#ff8800
