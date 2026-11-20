@@ -240,12 +240,18 @@ private:
         vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
     }
 
+	bool checkDeviceExtensionSupport(VkPhysicalDevice device) {
+		return true;	
+	} 
+
     bool isDeviceSuitable(VkPhysicalDevice device) {
         QueueFamilyIndices indices = findQueueFamilies(device);
 
-        return indices.isComplete();
-    }
+	bool extensionsSupported = checkDeviceExtensionSupport(device);
 
+	return indices.isComplete() && extensionsSupported; 
+
+    }
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
         QueueFamilyIndices indices;
 
