@@ -1,6 +1,9 @@
 " Vim with all enhancements
 source $VIMRUNTIME/vimrc_example.vim
+<<<<<<< HEAD
 source $MYVIMRC
+=======
+>>>>>>> origin/main
 
 set termguicolors
 set number
