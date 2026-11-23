@@ -398,6 +398,11 @@ VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& avai
 	return VK_PRESENT_MODE_FIFO_KHR;
 }
 
+VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitesKHR& capabilites) {
+
+	
+}	
+
 int main() {
     HelloTriangleApplication app;
 
