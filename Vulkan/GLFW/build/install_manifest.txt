@@ -1,0 +1,8 @@
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/install/lib/libglfw3.a
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/install/include/GLFW/glfw3.h
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/install/include/GLFW/glfw3native.h
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/install/lib/cmake/glfw3/glfw3Config.cmake
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/install/lib/cmake/glfw3/glfw3ConfigVersion.cmake
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/install/lib/cmake/glfw3/glfw3Targets.cmake
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/install/lib/cmake/glfw3/glfw3Targets-release.cmake
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/install/lib/pkgconfig/glfw3.pc
