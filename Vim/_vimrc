@@ -3,9 +3,20 @@ source $VIMRUNTIME/vimrc_example.vim
 
 set termguicolors
 set number
+set formatoptions-=c
+set formatoptions-=r
+set formatoptions-=o
+
+" Load project-specific Vulkan highlighting
+let s:vulkan_syntax = getcwd() . '/vimfiles/after/syntax/cpp.vim'
+
+if filereadable(s:vulkan_syntax)
+    execute 'source ' . fnameescape(s:vulkan_syntax)
+endif
 
 " Use the internal diff if available.
 " Otherwise use the special 'diffexpr' for Windows.
+
 if &diffopt !~# 'internal'
   set diffexpr=MyDiff()
 endif
@@ -94,3 +105,15 @@ highlight cppSTLtype ctermfg=46 guifg=#00ff00
 " Functions - Orange
 highlight cUserFunction ctermfg=208 guifg=#ff8800
 highlight cppSTLfunction ctermfg=208 guifg=#ff8800
+
+" Custom C++ and Vulkan types
+syntax keyword cppCustomType VkResult VkInstance VkDevice
+syntax keyword cppCustomType VkPhysicalDevice VkQueue
+syntax keyword cppCustomType VkAllocationCallbacks
+syntax keyword cppCustomType VkDebugUtilsMessengerEXT
+syntax keyword cppCustomType VkDebugUtilsMessengerCreateInfoEXT
+syntax keyword cppCustomType VkCommandPool VkBuffer VkImage
+syntax keyword cppCustomType vector string unique_ptr shared_ptr
+"
+" Link custom types to the existing Type colour
+highlight default link cppCustomType Type

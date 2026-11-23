@@ -388,6 +388,16 @@ VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>
 	return avaliableFormats[0];
 }
 
+VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
+	for (const auto& availablePresentMode : avalaiblePresentModes) {
+       		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) { 
+			return availablePresentMode;
+		}	
+	}
+
+	return VK_PRESENT_MODE_FIFO_KHR;
+}
+
 int main() {
     HelloTriangleApplication app;
 

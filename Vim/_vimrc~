@@ -3,6 +3,9 @@ source $VIMRUNTIME/vimrc_example.vim
 
 set termguicolors
 set number
+set formatoptions-=c
+set formatoptions-=r
+set formatoptions-=o
 
 " Use the internal diff if available.
 " Otherwise use the special 'diffexpr' for Windows.
@@ -73,3 +76,36 @@ highlight Character ctermfg=226 guifg=#ffff00
 
 " Comments - Grey
 highlight Comment ctermfg=8 guifg=#808080
+
+" Additional C/C++ syntax groups
+
+" Variables and identifiers - Purple
+highlight cIdentifier ctermfg=141 guifg=#bb86fc
+highlight cppIdentifier ctermfg=141 guifg=#bb86fc
+
+" Constants - Purple
+highlight cConstant ctermfg=141 guifg=#bb86fc
+highlight cppConstant ctermfg=141 guifg=#bb86fc
+
+" User-defined types - Green
+highlight cUserType ctermfg=46 guifg=#00ff00
+highlight cppUserType ctermfg=46 guifg=#00ff00
+
+" C++ STL types - Green
+highlight cppSTLtype ctermfg=46 guifg=#00ff00
+
+" Functions - Orange
+highlight cUserFunction ctermfg=208 guifg=#ff8800
+highlight cppSTLfunction ctermfg=208 guifg=#ff8800
+
+" Custom C++ and Vulkan types
+syntax keyword cppCustomType VkResult VkInstance VkDevice
+syntax keyword cppCustomType VkPhysicalDevice VkQueue
+syntax keyword cppCustomType VkAllocationCallbacks
+syntax keyword cppCustomType VkDebugUtilsMessengerEXT
+syntax keyword cppCustomType VkDebugUtilsMessengerCreateInfoEXT
+syntax keyword cppCustomType VkCommandPool VkBuffer VkImage
+syntax keyword cppCustomType vector string unique_ptr shared_ptr
+"
+" Link custom types to the existing Type colour
+highlight default link cppCustomType Type
