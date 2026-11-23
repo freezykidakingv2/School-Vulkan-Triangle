@@ -400,7 +400,23 @@ VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& avai
 
 VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitesKHR& capabilites) {
 
-	
+	if (capabilites.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+		return capabilites.currentExtent;	
+	}
+	else {
+		int width, hegiht;
+		glfwGetFrameBuffersSize(window, &width, &height);
+		
+		VkExent2d actualExtent = { 
+			static_cast<uint32_t>(width),
+			static_cast<uint32_t>(height)	
+		};
+
+		actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtentent.width, capabilities.maxImageExtent.width);
+		actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtentent.height, capabilities.maxImageExtent.height);
+
+		return actualExtent;
+	}	
 }	
 
 int main() {
