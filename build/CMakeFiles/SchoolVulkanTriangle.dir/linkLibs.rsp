@@ -1,0 +1,1 @@
+ "C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/install/lib/libglfw3.a" "C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/install/lib/libvulkan-1.dll.a" -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 

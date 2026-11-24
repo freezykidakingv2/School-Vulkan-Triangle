@@ -1,0 +1,38 @@
+#version 460
+#extension GL_EXT_descriptor_heap : require
+#extension GL_EXT_structured_descriptor_heap : require
+#extension GL_EXT_scalar_block_layout : require
+
+layout(local_size_x = 1) in;
+
+layout(buffer_type, scalar) buffer DataBuffer {
+    uvec2 vector;
+    uint values[2];
+};
+
+struct Material {
+    uint count;
+    DataBuffer dataBuffer;
+};
+
+layout(heap_offset = 0) resourceheap BufferHeap0 {
+    uint count;
+    DataBuffer dataBuffer;
+    Material materials[2];
+} bufferHeap0;
+
+void writeValue(out uint value) {
+    value = 1;
+}
+
+void updateValue(inout uint value) {
+    value += 1;
+}
+
+void main() {
+    uint index = gl_LocalInvocationID.x & 1u;
+    bufferHeap0.dataBuffer.values[0] = index;
+    bufferHeap0.materials[index].dataBuffer.vector.xy = uvec2(index);
+    writeValue(bufferHeap0.dataBuffer.values[index]);
+    updateValue(bufferHeap0.materials[index].dataBuffer.values[0]);
+}
