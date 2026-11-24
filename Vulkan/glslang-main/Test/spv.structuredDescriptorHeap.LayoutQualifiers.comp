@@ -1,0 +1,39 @@
+// Covers heap buffer layout qualifiers for buffer types.
+#version 460
+#extension GL_EXT_descriptor_heap : require
+#extension GL_EXT_structured_descriptor_heap : require
+#extension GL_EXT_scalar_block_layout : require
+
+layout(local_size_x = 1) in;
+
+layout(buffer_type, std140) buffer Std140Type {
+    vec4 v;
+    uint x;
+};
+
+layout(buffer_type, std430) buffer Std430Type {
+    vec4 v;
+    uint x;
+};
+
+layout(buffer_type, scalar) buffer ScalarType {
+    vec3 v;
+    uint x;
+};
+
+layout(heap_offset = 512) resourceheap LayoutHeap {
+    Std140Type typeStd140;
+    Std430Type typeStd430;
+    ScalarType typeScalar;
+} layoutHeap;
+
+layout(binding = 0, std430) buffer Result {
+    uint value;
+} resultBuffer;
+
+void main()
+{
+    resultBuffer.value = layoutHeap.typeStd140.x +
+                         layoutHeap.typeStd430.x +
+                         layoutHeap.typeScalar.x;
+}
