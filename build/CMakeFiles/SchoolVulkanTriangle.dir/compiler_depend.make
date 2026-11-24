@@ -587,4 +587,12 @@ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gc
 
 C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/gthr.h:
 
-C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gc
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/os_defines.h:
+
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/limits.h:
+
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stddef.h:
+
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stdint.h:
+
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/syslimits.h:

@@ -106,3 +106,7 @@ highlight cppSTLfunction ctermfg=208 guifg=#ff8800
 
 " Link custom types to the existing Type colour
 highlight default link cppCustomType Type
+
+" Change { colour
+syntax match MyBraces /[{}]/
+highlight MyBraces guifg=#ff0080 ctermfg=magenta

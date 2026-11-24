@@ -198,4 +198,6 @@ CMakeFiles/SchoolVulkanTriangle.dir/School_Vulkan_Triangle.cpp.obj
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/limits.h
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/mm_malloc.h
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stddef.h
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stdint.h
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/syslimits.h
+
