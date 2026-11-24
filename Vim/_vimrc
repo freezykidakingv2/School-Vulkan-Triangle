@@ -1,3 +1,4 @@
+set runtimepath^=C:/Users/Student/Documents/School-Vulkan-Triangle-main/vimfiles
 " Add project vim configuration
 let s:project_vimfiles = expand('~/Documents/School-Vulkan-Triangle-main/vimfiles')
 
