@@ -101,6 +101,10 @@ private:
 	    
 		    imageCount = swapChainSupport.capabilities.maxImageCount;
 	    }
+
+	    VkSwapChainCreateInfoKHR createInfo{};
+	    createInfo.stype = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+	    createInfo.surface = surface;
     }
 
     void mainLoop() {
