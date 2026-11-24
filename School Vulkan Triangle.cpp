@@ -111,6 +111,25 @@ private:
 	    createInfo.imageExtent = extent;
 	    createInfo.imageArrayLayers = 1;
 	    createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	    
+	    QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+	    uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+
+	    if (indices.graphicsFamily != indices.presentFamily) { 
+	    
+		    createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+		    createInfo.queueFamilyIndexCount = 2;
+		    createInfo.pQueueFamilyIndices = queueFamilyIndices;
+	    }
+	    else { 
+	    
+		    createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		    createInfo.queueFamilyIndexCount = 0;
+		    createInfo.pQueueFamilyIndices = nullptr;
+	    }
+
+	    createInfo.preTransom = swapChainSupport.capabilities.currentTransform;
+	    createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     }
 
     void mainLoop() {
