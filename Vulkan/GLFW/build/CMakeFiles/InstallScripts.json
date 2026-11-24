@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/GLFW/build/cmake_install.cmake",
+		"C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/GLFW/build/src/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
