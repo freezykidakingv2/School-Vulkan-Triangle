@@ -84,6 +84,23 @@ private:
         createSurface();
         pickPhysicalDevice();
         createLogicalDevice();
+	createSwapChain();
+    }
+
+    void createSwapChain() {
+
+	    SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
+
+	    VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
+	    VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
+	    VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
+
+	    uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
+
+	    if (swapChainSupport.capabilites.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) { 
+	    
+		    imageCount = swapChainSupport.capabilities.maxImageCount;
+	    }
     }
 
     void mainLoop() {
