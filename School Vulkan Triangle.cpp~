@@ -19,6 +19,10 @@ const std::vector<const char*> validationLayers = {
     "VK_LAYER_KHRONOS_validation"
 };
 
+const std::vector<const char*> deviceExtensions = {
+ 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
+};	
+
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
 #else
@@ -79,6 +83,7 @@ private:
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+
     }
 
     void initVulkan() {
@@ -90,14 +95,9 @@ private:
 	createSwapChain();
     }
 
-    VkSwapchainKHR swapChain;
-    VkFormat swapChainImageFormat;
-    VkExtent2D swapChainExtent;
-    std::vector<VkImage> swapChainImages;
-
     void createSwapChain() {
 
-	    SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
+	    SwapchainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
 
 	    VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
 	    VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
@@ -295,8 +295,8 @@ private:
 
         createInfo.pEnabledFeatures = &deviceFeatures;
 
-	createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtension.size());
-        createInfo.ppEnabledExtensionNames = deviceExtension.data();	
+	createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+        createInfo.ppEnabledExtensionNames = deviceExtensions.data();	
 
         if (enableValidationLayers) {
             createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -489,7 +489,7 @@ VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitesKHR& capabilites) {
 
 		return actualExtent;
 	}	
-}	
+}
 
 int main() {
     HelloTriangleApplication app;
