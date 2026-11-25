@@ -54,6 +54,12 @@ struct QueueFamilyIndices {
     }
 };
 
+struct SwapChainSupportDetails {
+	VkSurfaceCapabilitiesKHR capabilities;
+	std::vector<VkSurfaceFormatKHR> formats;
+	std::vector<VkPresentModeKHR> presentModes;	
+};
+
 class HelloTriangleApplication {
 public:
     void run() {
@@ -95,9 +101,35 @@ private:
 	createSwapChain();
     }
 
+SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
+
+		SwapChainSupportDetails details;
+			
+			vkGetPhysicalDeviceSurfaceCapabilitesKHR(device, surface, &details.capabilities);
+
+				uint32_t formatCount;
+					vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+
+						if (formatcount != 0) {
+									details.formats.resize(formatCount);
+											vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.format.data());	
+												}
+							
+							uint32_t presentModeCount;
+								vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
+
+									if (presentModeCount != 0) {
+											
+												details.presentMode.resize(presentModeCount);
+														vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, $presentModeCount, details.presentModes.data();	
+																	}
+
+																		return details;
+																		}
+
     void createSwapChain() {
 
-	    SwapchainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
+	    SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
 
 	    VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
 	    VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
@@ -422,32 +454,6 @@ private:
         return VK_FALSE;
     }
 };
-
-SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
-
-	SwapChainSupportDetails details;
-	
-	vkGetPhysicalDeviceSurfaceCapabilitesKHR(device, surface, &details.capabilities);
-
-	uint32_t formatCount;
-	vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
-
-	if (formatcount != 0) {
-		details.formats.resize(formatCount);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.format.data());	
-	}
-	
-	uint32_t presentModeCount;
-	vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
-
-	if (presentModeCount != 0) {
-	
-		details.presentMode.resize(presentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, $presentModeCount, details.presentModes.data();	
-	}
-
-	return details;
-}
 
 VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
 	
