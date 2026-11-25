@@ -52,6 +52,22 @@ function MyDiff()
   endif
 endfunction
 
+if executable('clangd')
+	    au User lsp_setup call lsp#register_server({
+		            \ 'name': 'clangd',
+			            \ 'cmd': {server_info->['clangd']},
+				            \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp'],
+					            \ })
+endif
+
+if executable('clangd')
+	    call lsp#register_server({
+		            \ 'name': 'clangd',
+			            \ 'cmd': {server_info->['clangd']},
+				            \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp'],
+					            \ })
+endif
+
 " ==========================
 " C++ COLOUR SCHEME
 " ==========================
