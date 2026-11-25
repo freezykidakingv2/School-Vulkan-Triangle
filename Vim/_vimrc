@@ -52,6 +52,10 @@ function MyDiff()
   endif
 endfunction
 
+set runtimepath^=C:/Users/Student/Documents/School-Vulkan-Triangle-main/vimfiles/pack/plugins/start/vim-lsp
+
+source C:/Users/Student/Documents/School-Vulkan-Triangle-main/vimfiles/pack/plugins/start/vim-lsp/plugin/lsp.vim
+
 if executable('clangd')
 	    au User lsp_setup call lsp#register_server({
 		            \ 'name': 'clangd',
