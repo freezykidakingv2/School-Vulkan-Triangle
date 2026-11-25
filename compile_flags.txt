@@ -1,3 +1,4 @@
+--target=x86_64-w64-windows-gnu
 -std=c++17
 -I
 Vulkan/GLFW/include
@@ -15,3 +16,5 @@ bin/../x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/backward
 bin/../x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include
 -isystem
 bin/../x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include-fixed
+-isystem
+include

@@ -1,6 +1,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-
+#include <string>
+#include <limits>
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
@@ -109,7 +111,7 @@ private:
 	    }
 
 	    VkSwapChainCreateInfoKHR createInfo{};
-	    createInfo.stype = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+	    createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	    createInfo.surface = surface;
 	    createInfo.minImageCount = imageCount;
 	    createInfo.imageFormat = surfaceFormat.format;
@@ -134,13 +136,13 @@ private:
 		    createInfo.pQueueFamilyIndices = nullptr;
 	    }
 
-	    createInfo.preTransom = swapChainSupport.capabilities.currentTransform;
+	    createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
 	    createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	    createInfo.presentMode = presentMode;
 	    createInfo.clipped = VK_TRUE;
-	    createInfo.oldSwapChain = VK_NULL_HANDLE;
+	    createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-	    VkSwapChainKHR swapChain;
+	    VkSwapchainKHR swapChain;
 
 	    if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain) != VK_SUCCESS) { 
 	    

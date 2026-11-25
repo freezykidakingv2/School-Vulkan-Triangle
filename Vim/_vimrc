@@ -67,9 +67,12 @@ endif
 if executable('clangd')
 	    call lsp#register_server({
 		            \ 'name': 'clangd',
-			            \ 'cmd': {server_info->['clangd']},
-				            \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp'],
-					            \ })
+			            \ 'cmd': {server_info->[
+				            \     'clangd',
+					            \     '--query-driver=C:/Users/Student/Documents/School-Vulkan-Triangle-main/bin/g++.exe'
+	            \ ]},
+		            \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp'],
+			            \ })
 endif
 
 " ==========================
