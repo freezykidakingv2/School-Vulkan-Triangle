@@ -1,0 +1,3 @@
+C:\Users\Student\Documents\School-Vulkan-Triangle-main\cmake-4.5.0-windows-x86_64\bin\cmake.exe -E rm -f CMakeFiles\SchoolVulkanTriangle.dir/objects.a
+C:\Users\Student\Documents\School-Vulkan-Triangle-main\bin\ar.exe qc CMakeFiles\SchoolVulkanTriangle.dir/objects.a @CMakeFiles\SchoolVulkanTriangle.dir\objects1.rsp
+C:\Users\Student\Documents\School-Vulkan-Triangle-main\bin\c++.exe -O3 -DNDEBUG -Wl,--whole-archive CMakeFiles\SchoolVulkanTriangle.dir/objects.a -Wl,--no-whole-archive -o SchoolVulkanTriangle.exe -Wl,--out-implib,libSchoolVulkanTriangle.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\SchoolVulkanTriangle.dir\linkLibs.rsp
