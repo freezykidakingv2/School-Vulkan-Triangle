@@ -102,15 +102,14 @@ private:
     }
 
 SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
-
-		SwapChainSupportDetails details;
+	SwapChainSupportDetails details;
 			
-			vkGetPhysicalDeviceSurfaceCapabilitesKHR(device, surface, &details.capabilities);
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
 
-				uint32_t formatCount;
-					vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+	uint32_t formatCount;
+	vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
 
-						if (formatcount != 0) {
+	if (formatcount != 0) {
 									details.formats.resize(formatCount);
 											vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.format.data());	
 												}
