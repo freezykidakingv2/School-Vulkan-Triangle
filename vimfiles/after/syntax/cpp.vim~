@@ -1,0 +1,34 @@
+"Vulkan types
+syntax keyword cppVulkantType
+    \ VkResult VkInstance VkPhysicalDevice VkDevice
+    \ VkQueue VkSurfaceKHR VkSwapchainKHR
+    \ VkAllocationCallbacks
+    \ VkDebugUtilsMessengerEXT
+    \ VkDebugUtilsMessengerCreateInfoEXT
+    \ VkCommandPool VkCommandBuffer
+    \ VkBuffer VkImage VkImageView
+    \ VkShaderModule VkPipeline
+    \ VkPipelineLayout VkRenderPass
+    \ VkFramebuffer VkSemaphore VkFence
+    \ VkSubmitInfo VkPresentInfoKHR
+    \ VkCommandBufferBeginInfo
+    \ VkApplicationInfo VkInstanceCreateInfo
+    \ VkDeviceCreateInfo VkQueueCreateInfo
+    \ VkPhysicalDeviceFeatures VkExtent2D
+    \ VkSurfaceCapabilitiesKHR
+    \ VkSurfaceFormatKHR VkPresentModeKHR
+
+"Vulkan functions
+syntax match cppVulknaFunction "\<vk[A-Z][A-Za-z0-9_]*\>"
+
+"Vulkan constants and macros
+syntax match cppVulkanConstant "\<Vk_[A-Z0-9_]*\>"
+
+highlight cppVulkanType
+    \ guifg=#00ff00 ctermfg=46
+
+highlight cppVulkanFunction
+    \ guifg=#ff8800 ctermfg=208
+
+highlight cppVulkanConstant
+    \ guifg=#448aff ctermfg=33
