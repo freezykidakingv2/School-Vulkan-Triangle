@@ -31,19 +31,16 @@ CMakeFiles/SchoolVulkanTriangle.dir/School_Vulkan_Triangle.cpp.obj: \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/install/include/vk_video/vulkan_video_codec_vp9std_decode.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/install/include/vk_video/vulkan_video_codec_vp9std.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/GL/gl.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/iostream \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/string \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/requires_hosted.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/c++config.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/os_defines.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/cpu_defines.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/pstl/pstl_config.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/ostream \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/ostream.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/ios \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/iosfwd \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/stringfwd.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/memoryfwd.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/version.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/char_traits.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/postypes.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cwchar \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/wchar.h \
@@ -56,22 +53,15 @@ CMakeFiles/SchoolVulkanTriangle.dir/School_Vulkan_Triangle.cpp.obj: \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/_mingw_stat64.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/swprintf.inl \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/sec_api/wchar_s.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/exception \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/exception.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/exception_ptr.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/exception_defines.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/cxxabi_init_exception.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/typeinfo \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/hash_bytes.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/new \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/new_except.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/move.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/type_traits \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/nested_exception.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/char_traits.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/compare \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/concepts \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/stl_construct.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/new \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/exception.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/new_except.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/exception_defines.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/move.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/stl_iterator_base_types.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/iterator_concepts.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/ptr_traits.h \
@@ -79,45 +69,20 @@ CMakeFiles/SchoolVulkanTriangle.dir/School_Vulkan_Triangle.cpp.obj: \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/stl_iterator_base_funcs.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/concept_check.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/debug/assertions.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/allocator.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/c++allocator.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/new_allocator.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/new_throw.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/cpp_type_traits.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/localefwd.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/c++locale.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/clocale \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/locale.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/stdio.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/sec_api/stdio_s.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/iosfwd \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cctype \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/ctype.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/ios_base.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/ext/atomicity.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/gthr.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/gthr-default.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/pthread.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/errno.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/sys/types.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/process.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/corecrt_startup.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/limits.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/syslimits.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/limits.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/signal.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/pthread_signal.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/time.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/sys/timeb.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/sec_api/sys/timeb_s.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/_timeval.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/pthread_time.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/pthread_compat.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/sched.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/pthread_unistd.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/atomic_word.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/locale_classes.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/functexcept.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/string \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/allocator.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/c++allocator.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/new_allocator.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/new_throw.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/cpp_type_traits.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/ostream_insert.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/cxxabi_forced.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/stl_iterator.h \
@@ -141,6 +106,7 @@ CMakeFiles/SchoolVulkanTriangle.dir/School_Vulkan_Triangle.cpp.obj: \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/alloc_traits.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/string_view \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/functional_hash.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/hash_bytes.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/ranges_base.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/max_size_type.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/numbers \
@@ -149,10 +115,14 @@ CMakeFiles/SchoolVulkanTriangle.dir/School_Vulkan_Triangle.cpp.obj: \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/ext/string_conversions.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstdlib \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/stdlib.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/limits.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/syslimits.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/limits.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/sec_api/stdlib_s.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/stdlib.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/malloc.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/mm_malloc.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/errno.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/std_abs.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstdio \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cerrno \
@@ -165,6 +135,46 @@ CMakeFiles/SchoolVulkanTriangle.dir/School_Vulkan_Triangle.cpp.obj: \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/tuple \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/invoke.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/ranges_util.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/algorithm \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/stl_algo.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/algorithmfwd.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/stl_heap.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/uniform_int_dist.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/stl_tempbuf.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/ranges_algo.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/ranges_algobase.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/pstl/glue_algorithm_defs.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/pstl/execution_defs.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/iostream \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/ostream \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/ostream.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/ios \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/exception \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/exception_ptr.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/cxxabi_init_exception.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/typeinfo \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/nested_exception.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/ios_base.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/ext/atomicity.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/gthr.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/gthr-default.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/pthread.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/sys/types.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/process.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/corecrt_startup.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/signal.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/pthread_signal.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/time.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/sys/timeb.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/sec_api/sys/timeb_s.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/_timeval.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/pthread_time.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/pthread_compat.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/sched.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/include/pthread_unistd.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/atomic_word.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/locale_classes.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/functexcept.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/locale_classes.tcc \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/system_error \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/x86_64-w64-mingw32/bits/error_constants.h \
@@ -200,4 +210,5 @@ CMakeFiles/SchoolVulkanTriangle.dir/School_Vulkan_Triangle.cpp.obj: \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/ext/aligned_buffer.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/node_handle.h \
  C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/stl_set.h \
- C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/stl_multiset.h
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/bits/stl_multiset.h \
+ C:/Users/Student/Documents/School-Vulkan-Triangle-main/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/16.2.0/include/c++/cstdint

@@ -122,7 +122,7 @@ CMAKE_OBJDUMP:FILEPATH=C:/Users/Student/Documents/School-Vulkan-Triangle-main/bi
 // find_package(), find_program(), find_library(), find_file(),
 // and find_path(). Empty by default; intended to be set by the
 // project or the user.
-CMAKE_PREFIX_PATH:UNINITIALIZED=C:\Users\Student\Documents\School-Vulkan-Triangle-main\Vulkan\install
+CMAKE_PREFIX_PATH:UNINITIALIZED=%VULKAN_DIR%\install
 
 //Value Computed by CMake
 CMAKE_PROJECT_COMPAT_VERSION:STATIC=
