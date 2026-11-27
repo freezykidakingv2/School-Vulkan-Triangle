@@ -1,0 +1,136 @@
+set runtimepath^=C:/Users/Student/Documents/School-Vulkan-Triangle-main/vimfiles
+" Add project vim configuration
+let s:project_vimfiles = expand('~/Documents/School-Vulkan-Triangle-main/vimfiles')
+
+execute 'set runtimepath^=' . fnameescape(s:project_vimfiles)
+execute 'set runtimepath+=' . fnameescape(s:project_vimfiles . '/after')
+
+source $VIMRUNTIME/vimrc_example.vim
+
+set termguicolors
+set number
+set formatoptions-=c
+set formatoptions-=r
+set formatoptions-=o
+
+" Use the internal diff if available.
+" Otherwise use the special 'diffexpr' for Windows.
+
+if &diffopt !~# 'internal'
+  set diffexpr=MyDiff()
+endif
+function MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg1 = substitute(arg1, '!', '\!', 'g')
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg2 = substitute(arg2, '!', '\!', 'g')
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  let arg3 = substitute(arg3, '!', '\!', 'g')
+  if $VIMRUNTIME =~ ' '
+    if &sh =~ '\<cmd'
+      if empty(&shellxquote)
+        let l:shxq_sav = ''
+        set shellxquote&
+      endif
+      let cmd = '"' . $VIMRUNTIME . '\diff"'
+    else
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+    endif
+  else
+    let cmd = $VIMRUNTIME . '\diff'
+  endif
+  let cmd = substitute(cmd, '!', '\!', 'g')
+  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3
+  if exists('l:shxq_sav')
+    let &shellxquote=l:shxq_sav
+  endif
+endfunction
+
+set runtimepath^=C:/Users/Student/Documents/School-Vulkan-Triangle-main/vimfiles/pack/plugins/start/vim-lsp
+
+source C:/Users/Student/Documents/School-Vulkan-Triangle-main/vimfiles/pack/plugins/start/vim-lsp/plugin/lsp.vim
+
+if executable('clangd')
+	    au User lsp_setup call lsp#register_server({
+		            \ 'name': 'clangd',
+			            \ 'cmd': {server_info->['clangd']},
+				            \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp'],
+					            \ })
+endif
+
+if executable('clangd')
+	    call lsp#register_server({
+		            \ 'name': 'clangd',
+			            \ 'cmd': {server_info->[
+				            \     'clangd',
+					            \     '--query-driver=C:/Users/Student/Documents/School-Vulkan-Triangle-main/bin/g++.exe'
+	            \ ]},
+		            \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp'],
+			            \ })
+endif
+
+" ==========================
+" C++ COLOUR SCHEME
+" ==========================
+
+syntax enable
+filetype plugin indent on
+
+" Functions - Orange
+highlight Function ctermfg=208 guifg=#ff8800
+highlight link cFunction Function
+highlight link cppFunction Function
+
+" Variables - Purple
+highlight Identifier ctermfg=141 guifg=#bb86fc
+
+" Types - Green
+highlight Type ctermfg=46 guifg=#00ff00
+highlight link cType Type
+
+" Keywords - Blue
+highlight Statement ctermfg=33 guifg=#448aff
+highlight Conditional ctermfg=33 guifg=#448aff
+highlight Repeat ctermfg=33 guifg=#448aff
+highlight StorageClass ctermfg=33 guifg=#448aff
+
+" Strings - Yellow
+highlight String ctermfg=226 guifg=#ffff00
+highlight Character ctermfg=226 guifg=#ffff00
+
+" Comments - Grey
+highlight Comment ctermfg=8 guifg=#808080
+
+" Additional C/C++ syntax groups
+
+" Variables and identifiers - Purple
+highlight cIdentifier ctermfg=141 guifg=#bb86fc
+highlight cppIdentifier ctermfg=141 guifg=#bb86fc
+
+" Constants - Purple
+highlight cConstant ctermfg=141 guifg=#bb86fc
+highlight cppConstant ctermfg=141 guifg=#bb86fc
+
+" User-defined types - Green
+highlight cUserType ctermfg=46 guifg=#00ff00
+highlight cppUserType ctermfg=46 guifg=#00ff00
+
+" C++ STL types - Green
+highlight cppSTLtype ctermfg=46 guifg=#00ff00
+
+" Functions - Orange
+highlight cUserFunction ctermfg=208 guifg=#ff8800
+highlight cppSTLfunction ctermfg=208 guifg=#ff8800
+
+" Link custom types to the existing Type colour
+highlight default link cppCustomType Type
+
+" Change { colour
+syntax match MyBraces /[{}]/
+highlight MyBraces guifg=#ff0080 ctermfg=magenta

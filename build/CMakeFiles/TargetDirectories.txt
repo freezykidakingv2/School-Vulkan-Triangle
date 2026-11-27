@@ -1,0 +1,3 @@
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/build/CMakeFiles/SchoolVulkanTriangle.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/build/CMakeFiles/edit_cache.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/build/CMakeFiles/rebuild_cache.dir
