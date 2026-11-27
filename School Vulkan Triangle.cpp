@@ -124,6 +124,49 @@ SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
 	return details;
 }
 
+VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
+		
+		for (const auto& availableFormat : availableFormats) {
+			if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
+			    availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+			return availableFormat;
+		}
+						}
+	return availableFormats[0];
+}
+
+VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
+		for (const auto& availablePresentMode : availablePresentModes) {
+			if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) { 
+				return availablePresentMode;
+			}	
+
+			return VK_PRESENT_MODE_FIFO_KHR;
+		}
+}
+
+VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
+
+	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) 		    {
+		return capabilities.currentExtent;	
+	}
+	else {
+		int width, height;
+		glfwGetFramebufferSize(window, &width, &height);
+										
+	VkExtent2D actualExtent = { 
+		static_cast<uint32_t>(width),
+		static_cast<uint32_t>(height)	
+	};
+
+												actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+														actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+
+																return actualExtent;
+																	}	
+}
+
+
     void createSwapChain() {
 
 	    SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
@@ -345,9 +388,9 @@ SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device) {
 	
 		uint32_t extensionCount;
-		vkEnumerateDeviceExtensionProperties(device, nullptr, &extentionCount, nullptr);	
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);	
 		
-		std::vector<VkExtensionProperties> availabeExtentions(extensionCount);
+		std::vector<VkExtensionProperties> availableExtensions(extensionCount);
 		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());	
 
 		std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
@@ -451,48 +494,6 @@ SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
         return VK_FALSE;
     }
 };
-
-VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
-	
-	for (const auto& availableFormat : availableFormats) {
-		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-			return availabeFormat;
-		}
-	}
-	
-	return avaliableFormats[0];
-}
-
-VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
-	for (const auto& availablePresentMode : avalaiblePresentModes) {
-       		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) { 
-			return availablePresentMode;
-		}	
-	}
-
-	return VK_PRESENT_MODE_FIFO_KHR;
-}
-
-VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitesKHR& capabilites) {
-
-	if (capabilites.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
-		return capabilites.currentExtent;	
-	}
-	else {
-		int width, hegiht;
-		glfwGetFrameBuffersSize(window, &width, &height);
-		
-		VkExent2d actualExtent = { 
-			static_cast<uint32_t>(width),
-			static_cast<uint32_t>(height)	
-		};
-
-		actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtentent.width, capabilities.maxImageExtent.width);
-		actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtentent.height, capabilities.maxImageExtent.height);
-
-		return actualExtent;
-	}	
-}
 
 int main() {
     HelloTriangleApplication app;

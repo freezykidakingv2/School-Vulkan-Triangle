@@ -41,3 +41,8 @@ alt + g : komorebic stack-all
 
 # Unstack all windows
 alt + shift + g : komorebic unstack-all
+
+alt + ctrl + j : komorebic move down
+alt + ctrl + k : komorebic move up
+alt + ctrl + h : komorebic move right
+alt + ctrl + l : komorebic move left
