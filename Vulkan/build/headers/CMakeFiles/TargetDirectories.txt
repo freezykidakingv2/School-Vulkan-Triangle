@@ -1,0 +1,14 @@
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/CMakeFiles/test.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/CMakeFiles/edit_cache.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/CMakeFiles/rebuild_cache.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/CMakeFiles/list_install_components.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/CMakeFiles/install.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/CMakeFiles/install/local.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/CMakeFiles/install/strip.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/tests/CMakeFiles/test.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/tests/CMakeFiles/edit_cache.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/tests/CMakeFiles/rebuild_cache.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/tests/CMakeFiles/list_install_components.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/tests/CMakeFiles/install.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/tests/CMakeFiles/install/local.dir
+C:/Users/Student/Documents/School-Vulkan-Triangle-main/Vulkan/build/headers/tests/CMakeFiles/install/strip.dir

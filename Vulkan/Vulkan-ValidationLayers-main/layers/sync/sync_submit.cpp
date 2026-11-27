@@ -1,0 +1,903 @@
+/*
+ * Copyright (c) 2019-2026 Valve Corporation
+ * Copyright (c) 2019-2026 LunarG, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "sync/sync_submit.h"
+#include "sync/sync_validation.h"
+#include "sync/sync_image.h"
+#include "sync/sync_reporting.h"
+
+namespace syncval {
+
+AcquiredImage::AcquiredImage(const PresentedImage& presented, ResourceUsageTag acq_tag)
+    : image(presented.image), generator(presented.range_gen), acquire_tag(acq_tag), present_tag(presented.tag) {}
+
+SignalInfo::SignalInfo(const BatchContextPtr& batch, const SyncExecScope& exec_scope, uint64_t timeline_value)
+    : batch(batch), first_scope({batch->GetQueueId(), exec_scope}), timeline_value(timeline_value) {}
+
+SignalInfo::SignalInfo(uint64_t timeline_value) : first_scope(kQueueIdInvalid, SyncExecScope{}), timeline_value(timeline_value) {}
+
+SignalInfo::SignalInfo(const BatchContextPtr& acquire_batch, const PresentedImage& presented, ResourceUsageTag acquire_tag)
+    : batch(acquire_batch), first_scope(), acquired_image(std::make_shared<AcquiredImage>(presented, acquire_tag)) {}
+
+void SignalsUpdate::OnBinarySignal(const BatchContextPtr& batch, const SemaphoreSubmitInfo& submit_signal) {
+    const VkSemaphore semaphore = submit_signal.semaphore;
+
+    // Signal can't be registered in both lists at the same time.
+    assert(!vvl::Contains(binary_signal_requests, semaphore) || !vvl::Contains(binary_unsignal_requests, semaphore));
+
+    // Remove unsignal request (if any). It will be replaced by a signal request.
+    const bool found_unsignal_request = binary_unsignal_requests.erase(semaphore);
+
+    // Reject invalid signal
+    if (!found_unsignal_request) {
+        if (vvl::Contains(binary_signal_requests, semaphore) || vvl::Contains(sync_validator_.binary_signals_, semaphore)) {
+            return;  // [core validation check]: binary semaphore signaled twice in a row
+        }
+    }
+    // Register signal
+    const VkQueueFlags queue_flags = batch->GetQueueFlags();
+    const auto exec_scope = SyncExecScope::MakeSrc(queue_flags, submit_signal.stage_mask, VK_PIPELINE_STAGE_2_HOST_BIT);
+    binary_signal_requests.emplace(semaphore, SignalInfo(batch, exec_scope, 0));
+}
+
+bool SignalsUpdate::OnTimelineSignal(const BatchContextPtr& batch, const SemaphoreSubmitInfo& submit_signal) {
+    const VkSemaphore semaphore = submit_signal.semaphore;
+    std::vector<SignalInfo>& signals = timeline_signals[semaphore];
+
+    // Reject invalid signal
+    if (!signals.empty() && submit_signal.value <= signals.back().timeline_value) {
+        return false;  // [core validation check]: strictly increasing signal values
+    }
+
+    // Register signal
+    const VkQueueFlags queue_flags = batch->GetQueueFlags();
+    const auto exec_scope = SyncExecScope::MakeSrc(queue_flags, submit_signal.stage_mask, VK_PIPELINE_STAGE_2_HOST_BIT);
+    signals.emplace_back(SignalInfo(batch, exec_scope, submit_signal.value));
+    return true;
+}
+
+bool SignalsUpdate::RegisterSignals(const BatchContextPtr& batch, const vvl::span<const SemaphoreSubmitInfo>& submit_signals) {
+    bool registered_timeline_signal = false;
+    for (const auto& submit_signal : submit_signals) {
+        if (submit_signal.type == VK_SEMAPHORE_TYPE_BINARY) {
+            OnBinarySignal(batch, submit_signal);
+        } else {
+            registered_timeline_signal |= OnTimelineSignal(batch, submit_signal);
+        }
+    }
+    return registered_timeline_signal;
+}
+
+std::optional<SignalInfo> SignalsUpdate::OnBinaryWait(VkSemaphore semaphore) {
+    // Signal can't be registered in both lists at the same time.
+    assert(!vvl::Contains(binary_signal_requests, semaphore) || !vvl::Contains(binary_unsignal_requests, semaphore));
+
+    if (vvl::Contains(binary_unsignal_requests, semaphore)) {
+        return {};  // [core validation check]: multi wait
+    }
+
+    // Get resolving signal
+    std::optional<SignalInfo> resolving_signal;
+    if (auto it = binary_signal_requests.find(semaphore); it != binary_signal_requests.end()) {
+        resolving_signal.emplace(std::move(it->second));
+        binary_signal_requests.erase(it);
+    } else if (auto* registry_signal = vvl::Find(sync_validator_.binary_signals_, semaphore)) {
+        resolving_signal.emplace(*registry_signal);
+    } else {
+        return {};  // [core validation check]: missing signal for binary wait
+    }
+
+    // Register unsignal request
+    binary_unsignal_requests.emplace(semaphore);
+    return resolving_signal;
+}
+
+std::optional<SignalInfo> SignalsUpdate::OnTimelineWait(VkSemaphore semaphore, uint64_t wait_value) {
+    std::optional<SignalInfo> resolving_signal;
+    // Search for the smallest signal value that resolves the wait.
+    // At first check registered signals (they have smaller values)
+    if (const std::vector<SignalInfo>* signals = vvl::Find(sync_validator_.timeline_signals_, semaphore)) {
+        for (auto& signal : *signals) {
+            if (wait_value <= signal.timeline_value) {
+                resolving_signal.emplace(signal);
+                break;
+            }
+        }
+    }
+    // then check the pending signals
+    if (!resolving_signal.has_value()) {
+        if (const std::vector<SignalInfo>* pending_signals = vvl::Find(timeline_signals, semaphore)) {
+            for (auto& signal : *pending_signals) {
+                if (wait_value <= signal.timeline_value) {
+                    resolving_signal.emplace(signal);
+                    break;
+                }
+            }
+        }
+    }
+    // Register request to remove older signals
+    if (resolving_signal.has_value()) {
+        RemoveTimelineSignalsRequest request;
+        request.semaphore = semaphore;
+        request.signal_threshold_value = resolving_signal->timeline_value;
+        request.queue = resolving_signal->first_scope.queue;
+        remove_timeline_signals_requests.emplace_back(request);
+    }
+    return resolving_signal;  // empty result if it is a wait-before-signal
+}
+
+void SwapchainSubState::RecordPresentedImage(PresentedImage&& presented_image) {
+    // All presented images are stored within the swapchain until the are reaquired.
+    const uint32_t image_index = presented_image.image_index;
+    if (image_index >= presented.size()) presented.resize(image_index + 1);
+
+    // Use move semantics to avoid atomic operations on the contained shared_ptrs
+    presented[image_index] = std::move(presented_image);
+}
+
+// We move from the presented images array 1) so we don't copy shared_ptr, and 2) to mark it acquired
+PresentedImage SwapchainSubState::MovePresentedImage(uint32_t image_index, const std::shared_ptr<const vvl::Image>& image) {
+    if (presented.size() <= image_index) {
+        presented.resize(image_index + 1);
+    }
+    PresentedImage ret_val = std::move(presented[image_index]);
+    if (!ret_val.image) {
+        // If this is the first time the image has been acquired then it has no present record and we create one
+        // NOTE: It's also possible this is an invalid acquire but this is reported by core checks
+        ret_val = PresentedImage(image, image_index);
+    }
+    return ret_val;
+}
+
+void SwapchainSubState::GetPresentBatches(std::vector<BatchContextPtr>& batches) const {
+    for (const auto& presented_image : presented) {
+        if (presented_image.batch) {
+            batches.push_back(presented_image.batch);
+        }
+    }
+}
+
+class ApplySemaphoreBarrierAction {
+  public:
+    ApplySemaphoreBarrierAction(const SemaphoreScope& signal, const SemaphoreScope& wait) : signal_(signal), wait_(wait) {}
+    void operator()(AccessState* access) const { access->ApplySemaphore(signal_, wait_); }
+
+  private:
+    const SemaphoreScope& signal_;
+    const SemaphoreScope wait_;
+};
+
+class ApplyAcquireNextSemaphoreAction {
+  public:
+    ApplyAcquireNextSemaphoreAction(const SyncExecScope& wait_scope, ResourceUsageTag acquire_tag)
+        : barrier_(GetAcquireBarrier(wait_scope)), acq_tag_(acquire_tag) {}
+    void operator()(AccessState* access) const {
+        // Note that the present operations may or may not be present, given that the fence wait may have cleared them out.
+        // Also, if a subsequent present has happened, we *don't* want to protect that...
+        if (access->LastWriteTag() <= acq_tag_) {
+            access->ApplyBarrier(BarrierScope(barrier_), barrier_);
+        }
+    }
+
+  private:
+    static SyncBarrier GetAcquireBarrier(const SyncExecScope& wait_scope) {
+        SyncBarrier barrier;
+        barrier.src_exec_scope = getPresentSrcScope();
+        barrier.src_access_scope = getPresentValidAccesses();
+        barrier.dst_exec_scope = wait_scope;
+        return barrier;
+    }
+    // kPresentSrcScope/kPresentValidAccesses cannot be regular global variables, because they use global
+    // variables from another compilation unit (through syncStageAccessMaskByStageBit() call) for initialization,
+    // and initialization of globals between compilation units is undefined. Instead they get initialized
+    // on the first use (it's important to ensure this first use is also not initialization of some global!).
+    static const SyncExecScope& getPresentSrcScope() {
+        static const SyncExecScope kPresentSrcScope{VK_PIPELINE_STAGE_2_PRESENT_ENGINE_BIT_SYNCVAL,  // stage_mask (unused)
+                                                    VK_PIPELINE_STAGE_2_PRESENT_ENGINE_BIT_SYNCVAL,  // exec_scope
+                                                    getPresentValidAccesses(),                       // stage_mask_accesses
+                                                    getPresentValidAccesses()};                      // exec_scope_accesses
+        return kPresentSrcScope;
+    }
+    static const SyncAccessFlags& getPresentValidAccesses() {
+        static const SyncAccessFlags kPresentValidAccesses = SYNC_PRESENT_ENGINE_BIT_SYNCVAL_PRESENT_ACQUIRE_READ_BIT_SYNCVAL |
+                                                             SYNC_PRESENT_ENGINE_BIT_SYNCVAL_PRESENT_PRESENTED_BIT_SYNCVAL;
+        return kPresentValidAccesses;
+    }
+
+  private:
+    SyncBarrier barrier_;
+    ResourceUsageTag acq_tag_;
+};
+
+void LastSynchronizedPresent::Update(VkSwapchainKHR swapchain, ResourceUsageTag present_tag) {
+    for (auto& entry : per_swapchain) {
+        if (entry.first == swapchain) {
+            entry.second = std::max(entry.second, present_tag);
+            return;
+        }
+    }
+    per_swapchain.emplace_back(std::make_pair(swapchain, present_tag));
+}
+
+void LastSynchronizedPresent::Merge(const LastSynchronizedPresent& other) {
+    for (const auto& other_entry : other.per_swapchain) {
+        Update(other_entry.first, other_entry.second);
+    }
+}
+
+void LastSynchronizedPresent::OnDestroySwapchain(VkSwapchainKHR swapchain) {
+    // TODO: add erase() to small_vector and use intead in the following code
+    const auto copy = per_swapchain;
+    per_swapchain.resize(0);
+    for (const auto& entry : copy) {
+        if (entry.first != swapchain) {
+            per_swapchain.emplace_back(entry);
+        }
+    }
+}
+
+QueueBatchContext::QueueBatchContext(const SyncValidator& sync_state, const QueueState& queue_state)
+    : sync_state_(sync_state),
+      queue_state_(&queue_state),
+      tag_range_(0, 0),
+      access_context_(sync_state),
+      environment_(sync_state, queue_state.GetQueue()->GetQueueFlags(), queue_state.GetQueueId(), queue_state.GetQueue()->Handle(),
+                   events_context_, *this),
+      queue_sync_tag_(sync_state.GetQueueIdLimit(), ResourceUsageTag(0)) {
+    sync_state_.stats.AddQueueBatchContext();
+}
+
+QueueBatchContext::QueueBatchContext(const SyncValidator& sync_state)
+    : sync_state_(sync_state),
+      tag_range_(0, 0),
+      access_context_(sync_state),
+      environment_(sync_state, 0, kQueueIdInvalid, NullVulkanTypedHandle, events_context_, *this),
+      queue_sync_tag_(sync_state.GetQueueIdLimit(), ResourceUsageTag(0)) {
+    sync_state_.stats.AddQueueBatchContext();
+}
+
+QueueBatchContext::~QueueBatchContext() { sync_state_.stats.RemoveQueueBatchContext(); }
+
+void QueueBatchContext::Trim() {
+    // Clean up unneeded access context contents and log information
+    access_context_.Trim();
+
+    ResourceUsageTagSet used_tags;
+    access_context_.AddReferencedTags(used_tags);
+
+    // Note: AccessContexts in the SyncEventsState are trimmed when created.
+    events_context_.AddReferencedTags(used_tags);
+
+    // Only conserve AccessLog references that are referenced by used_tags
+    batch_log_.Trim(used_tags);
+}
+
+template <typename Predicate>
+void QueueBatchContext::ApplyPredicatedWait(Predicate& predicate, const LastSynchronizedPresent& last_synchronized_present) {
+    access_context_.EraseIf([this, &last_synchronized_present, &predicate](AccessState& access_state) {
+        // Tell EraseIf to remove present accesses that are already synchronized according to LastSynchronizedPresent
+        if (access_state.HasWriteOp() && access_state.LastWrite().IsPresent()) {
+            const VkSwapchainKHR swapchain = batch_log_.GetPresentSwapchain(access_state.LastWriteTag());
+            for (const auto& [synchronized_swapchain, synchronized_present_tag] : last_synchronized_present.per_swapchain) {
+                // NOTE: it is important to check that access belongs to a specific swapchain and not only
+                // compare the tag values. It is possible to have accesses from a different swapchain that
+                // are *not* synchronized and have tag values that satisfy tag comparison check.
+                if (swapchain == synchronized_swapchain && access_state.LastWriteTag() <= synchronized_present_tag) {
+                    return true;
+                }
+            }
+        }
+
+        // Tell eraseIf to remove accesses that become empty after applying predicate
+        return access_state.ClearPredicatedAccesses<Predicate>(predicate);
+    });
+}
+
+struct WaitQueueTagPredicate {
+    QueueId queue;
+    ResourceUsageTag tag;
+
+    bool operator()(const ReadState& read_access) const {
+        return read_access.queue == queue && read_access.tag <= tag &&
+               read_access.stage != VK_PIPELINE_STAGE_2_PRESENT_ENGINE_BIT_SYNCVAL;
+    }
+    bool operator()(const AccessState& access) const {
+        if (!access.HasWriteOp()) {
+            return false;
+        }
+        const WriteState& write_state = access.LastWrite();
+        return write_state.queue == queue && write_state.tag <= tag &&
+               write_state.access_index != SYNC_PRESENT_ENGINE_SYNCVAL_PRESENT_PRESENTED_SYNCVAL;
+    }
+};
+
+struct DeviceWaitPredicate {
+    bool operator()(const ReadState& read_access) const {
+        return read_access.stage != VK_PIPELINE_STAGE_2_PRESENT_ENGINE_BIT_SYNCVAL;
+    }
+    bool operator()(const AccessState& access) const {
+        if (!access.HasWriteOp()) {
+            return false;
+        }
+        return access.LastWrite().access_index != SYNC_PRESENT_ENGINE_SYNCVAL_PRESENT_PRESENTED_SYNCVAL;
+    }
+};
+
+// Present operations matching only the *exactly* tagged present and acquire operations
+struct WaitAcquirePredicate {
+    ResourceUsageTag present_tag;
+    ResourceUsageTag acquire_tag;
+
+    bool operator()(const ReadState& read_access) const {
+        return read_access.tag == acquire_tag && read_access.stage == VK_PIPELINE_STAGE_2_PRESENT_ENGINE_BIT_SYNCVAL;
+    }
+    bool operator()(const AccessState& access) const {
+        if (!access.HasWriteOp()) {
+            return false;
+        }
+        const WriteState& write_state = access.LastWrite();
+        return write_state.tag == present_tag && write_state.access_index == SYNC_PRESENT_ENGINE_SYNCVAL_PRESENT_PRESENTED_SYNCVAL;
+    }
+};
+
+void QueueBatchContext::ApplyTaggedWait(QueueId queue_id, ResourceUsageTag tag,
+                                        const LastSynchronizedPresent& last_synchronized_present) {
+    WaitQueueTagPredicate predicate{queue_id, tag};
+    ApplyPredicatedWait(predicate, last_synchronized_present);
+
+    // SwapChain acquire batch contexts have no queue
+    if (queue_state_ && queue_id == GetQueueId()) {
+        events_context_.ApplyTaggedWait(GetQueueFlags(), tag);
+    }
+}
+
+void QueueBatchContext::ApplyDeviceWait(const LastSynchronizedPresent& last_synchronized_present) {
+    DeviceWaitPredicate predicate;
+    ApplyPredicatedWait(predicate, last_synchronized_present);
+
+    // SwapChain acquire batch contexts have no queue
+    if (queue_state_) {
+        events_context_.ApplyTaggedWait(GetQueueFlags(), ResourceUsageRecord::kMaxIndex);
+    }
+}
+
+void QueueBatchContext::ApplyAcquireWait(const AcquiredImage& acquired) {
+    WaitAcquirePredicate predicate{acquired.present_tag, acquired.acquire_tag};
+    ApplyPredicatedWait(predicate, {});
+}
+
+void QueueBatchContext::OnResourceDestroyed(const AccessRange& resource_range) {
+    // Remove all accesses associated with the resource being destroyed
+    access_context_.EraseContainedEntries(resource_range);
+}
+
+// Batch barrier ops don't modify in place, and thus don't need to hold pending state, and also are *never* layout transitions.
+struct BatchBarrierOp {
+    SyncBarrier barrier;
+    BarrierScope barrier_scope;
+
+    BatchBarrierOp(QueueId queue_id, const SyncBarrier& barrier) : barrier(barrier), barrier_scope(barrier, queue_id) {}
+
+    void operator()(AccessState* access_state) const { access_state->ApplyBarrier(barrier_scope, barrier); }
+};
+
+void QueueBatchContext::ResolvePresentSemaphoreWait(const SignalInfo& signal_info, const PresentedImages& presented_images) {
+    assert(signal_info.batch);
+
+    const AccessContext& from_context = signal_info.batch->access_context_;
+    const SemaphoreScope& signal_scope = signal_info.first_scope;
+    const QueueId queue_id = GetQueueId();
+    const VkQueueFlags queue_flags = GetQueueFlags();
+    SemaphoreScope wait_scope{queue_id, SyncExecScope::MakeDst(queue_flags, VK_PIPELINE_STAGE_2_PRESENT_ENGINE_BIT_SYNCVAL)};
+
+    // If signal queue == wait queue, signal is treated as a memory barrier with an access scope equal to the present accesses
+    SyncBarrier sem_barrier(signal_scope, wait_scope, SyncBarrier::AllAccess());
+    const BatchBarrierOp sem_same_queue_op(wait_scope.queue, sem_barrier);
+
+    // Need to import the rest of the same queue contents without modification
+    SyncBarrier noop_barrier;
+    const BatchBarrierOp noop_barrier_op(wait_scope.queue, noop_barrier);
+
+    // For each presented image
+    for (const auto& presented : presented_images) {
+        if (signal_info.acquired_image) {
+            const AcquiredImage& acquired_image = *signal_info.acquired_image;
+
+            // Update last synchronized presentation
+            if (acquired_image.present_tag != kInvalidTag) {
+                const VkSwapchainKHR swapchain = acquired_image.image->create_from_swapchain;
+                last_synchronized_present.Update(swapchain, acquired_image.present_tag);
+            }
+
+            ApplyAcquireNextSemaphoreAction apply_acq(wait_scope, acquired_image.acquire_tag);
+            access_context_.ResolveFromContext(apply_acq, from_context, acquired_image.generator);
+
+        } else {
+            if (signal_scope.queue == wait_scope.queue) {
+                // If signal queue == wait queue, signal is treated as a memory barrier with an access scope equal to the
+                // valid accesses for the sync scope.
+                access_context_.ResolveFromContext(sem_same_queue_op, from_context, presented.range_gen);
+                access_context_.ResolveFromContext(noop_barrier_op, from_context);
+            } else {
+                // Otherwise apply semaphore rules apply
+                const ApplySemaphoreBarrierAction sem_not_same_queue_op(signal_scope, wait_scope);
+                access_context_.ResolveFromContext(sem_not_same_queue_op, from_context, presented.range_gen);
+
+                const SemaphoreScope noop_semaphore_scope(queue_id, noop_barrier.dst_exec_scope);
+                const ApplySemaphoreBarrierAction noop_sem_op(signal_scope, noop_semaphore_scope);
+                access_context_.ResolveFromContext(noop_sem_op, from_context);
+            }
+            last_synchronized_present.Merge(signal_info.batch->last_synchronized_present);
+        }
+    }
+}
+
+void QueueBatchContext::ResolveSubmitSemaphoreWait(const SignalInfo& signal_info, VkPipelineStageFlags2 wait_mask) {
+    assert(signal_info.batch);
+
+    const SemaphoreScope& signal_scope = signal_info.first_scope;
+    const VkQueueFlags queue_flags = GetQueueFlags();
+    SemaphoreScope wait_scope{GetQueueId(), SyncExecScope::MakeDst(queue_flags, wait_mask)};
+
+    const AccessContext& from_context = signal_info.batch->access_context_;
+    if (signal_info.acquired_image) {
+        const AcquiredImage& acquired_image = *signal_info.acquired_image;
+
+        // Update last synchronized presentation
+        if (acquired_image.present_tag != kInvalidTag) {
+            const VkSwapchainKHR swapchain = acquired_image.image->create_from_swapchain;
+            last_synchronized_present.Update(swapchain, acquired_image.present_tag);
+        }
+
+        // Import the *presenting* batch, but replacing presenting with acquired.
+        ApplyAcquireNextSemaphoreAction apply_acq(wait_scope, acquired_image.acquire_tag);
+        access_context_.ResolveFromContext(apply_acq, from_context, acquired_image.generator);
+
+        // Grab the reset of the presenting QBC, with no effective barrier, won't overwrite the acquire, as the tag is newer
+        SyncBarrier noop_barrier;
+        const BatchBarrierOp noop_barrier_op(wait_scope.queue, noop_barrier);
+        access_context_.ResolveFromContext(noop_barrier_op, from_context);
+    } else {
+        if (signal_scope.queue == wait_scope.queue) {
+            // If signal queue == wait queue, signal is treated as a memory barrier with an access scope equal to the
+            // valid accesses for the sync scope.
+            SyncBarrier sem_barrier(signal_scope, wait_scope, SyncBarrier::AllAccess());
+            const BatchBarrierOp sem_barrier_op(wait_scope.queue, sem_barrier);
+            access_context_.ResolveFromContext(sem_barrier_op, from_context);
+            events_context_.ApplyBarrier(sem_barrier.src_exec_scope, sem_barrier.dst_exec_scope, ResourceUsageRecord::kMaxIndex);
+        } else {
+            ApplySemaphoreBarrierAction sem_op(signal_scope, wait_scope);
+            access_context_.ResolveFromContext(sem_op, signal_info.batch->access_context_);
+        }
+        last_synchronized_present.Merge(signal_info.batch->last_synchronized_present);
+    }
+}
+
+void QueueBatchContext::ResolveLastBatch(BatchContextPtr last_batch, std::vector<BatchContextPtr>& resolved_batches) {
+    if (!last_batch || vvl::Contains(resolved_batches, last_batch)) {
+        return;
+    }
+
+    // Copy in the event state from the previous batch (on this queue)
+    events_context_.DeepCopy(last_batch->events_context_);
+
+    // If there are no semaphores to the previous batch, make sure a "submit order" non-barriered import is done
+    auto noop_action = [](AccessState* access) {};
+    access_context_.ResolveFromContext(noop_action, last_batch->access_context_);
+    ImportTags(*last_batch);
+
+    last_synchronized_present.Merge(last_batch->last_synchronized_present);
+    resolved_batches.emplace_back(std::move(last_batch));
+}
+
+void QueueBatchContext::ImportTags(const QueueBatchContext& from) {
+    batch_log_.Import(from.batch_log_);
+
+    // NOTE: Assumes that "from" has set its tag limit in its own queue_id slot
+    size_t q_limit = queue_sync_tag_.size();
+    assert(q_limit == from.queue_sync_tag_.size());
+    for (size_t q = 0; q < q_limit; q++) {
+        queue_sync_tag_[q] = std::max(queue_sync_tag_[q], from.queue_sync_tag_[q]);
+    }
+}
+
+std::vector<BatchContextPtr> QueueBatchContext::ResolvePresentWaits(vvl::span<const VkSemaphore> wait_semaphores,
+                                                                    const PresentedImages& presented_images,
+                                                                    SignalsUpdate& signals_update) {
+    std::vector<BatchContextPtr> batches_resolved;
+    for (VkSemaphore semaphore : wait_semaphores) {
+        auto signal_info = signals_update.OnBinaryWait(semaphore);
+        if (!signal_info) {
+            continue;  // Binary signal not found [core validation check]
+        }
+        ResolvePresentSemaphoreWait(*signal_info, presented_images);
+        ImportTags(*signal_info->batch);
+        batches_resolved.emplace_back(std::move(signal_info->batch));
+    }
+    return batches_resolved;
+}
+
+bool QueueBatchContext::DoQueuePresentValidate(const PresentedImages& presented_images) {
+    bool skip = false;
+
+    for (const PresentedImage& presented : presented_images) {
+        ImageRangeGen range_gen = presented.range_gen;
+        HazardResult hazard = access_context_.DetectHazard(range_gen, SYNC_PRESENT_ENGINE_SYNCVAL_PRESENT_PRESENTED_SYNCVAL);
+        if (hazard.IsHazard()) {
+            const VulkanTypedHandle swapchain_handle(presented.swapchain, kVulkanObjectTypeSwapchainKHR);
+            const VulkanTypedHandle image_handle = vvl::StateObject::Handle(presented.image);
+
+            LogObjectList objlist(queue_state_->GetQueue()->Handle(), swapchain_handle, image_handle);
+
+            std::ostringstream ss;
+            ss << "swapchain image " << presented.image_index << " (";
+            ss << sync_state_.FormatHandle(image_handle);
+            ss << " from " << sync_state_.FormatHandle(swapchain_handle) << ")";
+            const std::string resource_description = ss.str();
+
+            const std::string error = sync_state_.error_messages_.PresentError(hazard, *this, vvl::Func::vkQueuePresentKHR,
+                                                                               resource_description, presented.swapchain_index);
+            skip |= sync_state_.SyncError(hazard.Hazard(), objlist, vvl::Func::vkQueuePresentKHR, error);
+            if (skip) {
+                break;
+            }
+        }
+    }
+    return skip;
+}
+
+void QueueBatchContext::DoPresentOperations(const PresentedImages& presented_images) {
+    // For present, tagging is internal to the presented image record.
+    for (const auto& presented : presented_images) {
+        // Update memory state
+        presented.UpdateMemoryAccess(SYNC_PRESENT_ENGINE_SYNCVAL_PRESENT_PRESENTED_SYNCVAL, presented.tag, access_context_,
+                                     SyncFlag::kPresent);
+    }
+}
+
+void QueueBatchContext::LogPresentOperations(const PresentedImages& presented_images, uint64_t submit_index) {
+    if (tag_range_.size()) {
+        assert(tag_range_.size() == presented_images.size());
+        SwapchainOpLog log;
+        log.batch.queue_state = queue_state_;
+        log.batch.submit_index = submit_index;
+        log.batch.base_tag = tag_range_.begin;
+        for (const PresentedImage& presented : presented_images) {
+            log.ops.emplace_back(SwapchainOp{vvl::Func::vkQueuePresentKHR, presented.swapchain});
+        }
+        batch_log_.Insert(tag_range_, std::move(log));
+    }
+}
+
+void QueueBatchContext::DoAcquireOperation(const PresentedImage& presented) {
+    // Only one tag for acquire.  The tag in presented is the present tag
+    presented.UpdateMemoryAccess(SYNC_PRESENT_ENGINE_SYNCVAL_PRESENT_ACQUIRE_READ_SYNCVAL, tag_range_.begin, access_context_);
+}
+
+void QueueBatchContext::LogAcquireOperation(const PresentedImage& presented, vvl::Func command) {
+    SwapchainOpLog log;
+    log.batch.queue_state = queue_state_;
+    log.batch.base_tag = tag_range_.begin;
+    log.ops.emplace_back(SwapchainOp{command, presented.swapchain});
+    batch_log_.Insert(tag_range_, std::move(log));
+}
+
+void QueueBatchContext::SetupAccessContext(const PresentedImage& presented) {
+    if (presented.batch) {
+        auto noop_action = [](AccessState* access) {};
+        access_context_.ResolveFromContext(noop_action, presented.batch->access_context_);
+        ImportTags(*presented.batch);
+    }
+}
+
+std::vector<BatchContextPtr> QueueBatchContext::RegisterAsyncContexts(const std::vector<BatchContextPtr>& batches_resolved) {
+    // Gather async context information for hazard checks and conserve the QBC's for the async batches
+    auto skip_resolved_filter = [&batches_resolved](auto& batch) { return !vvl::Contains(batches_resolved, batch); };
+    std::vector<BatchContextPtr> async_batches = sync_state_.GetLastBatches(skip_resolved_filter);
+    for (const auto& async_batch : async_batches) {
+        const QueueId async_queue = async_batch->GetQueueId();
+        ResourceUsageTag sync_tag;
+        if (async_queue < queue_sync_tag_.size()) {
+            sync_tag = queue_sync_tag_[async_queue];
+        } else {
+            // If this isn't from a tracked queue, just check the batch itself
+            sync_tag = async_batch->tag_range_.begin;
+        }
+
+        // The start of the asynchronous access range for a given queue is one more than the highest tagged reference
+        access_context_.AddAsyncContext(async_batch->GetAccessContext(), sync_tag, async_batch->GetQueueId());
+        // We need to snapshot the async log information for async hazard reporting
+        batch_log_.Import(async_batch->batch_log_);
+    }
+    return async_batches;
+}
+
+QueueId QueueBatchContext::GetQueueId() const {
+    QueueId id = queue_state_ ? queue_state_->GetQueueId() : kQueueIdInvalid;
+    return id;
+}
+
+ResourceUsageTag QueueBatchContext::SetupBatchTags(uint32_t tag_count) {
+    tag_range_ = sync_state_.ReserveGlobalTagRange(tag_count);
+    access_context_.SetStartTag(tag_range_.begin);
+
+    // Needed for ImportTags to pick up the "from" own sync tag.
+    // NOTE: non-queued operations have an invalid queue id
+    const QueueId this_q = GetQueueId();
+    if (this_q != kQueueIdInvalid) {
+        assert(this_q < queue_sync_tag_.size());
+        queue_sync_tag_[this_q] = tag_range_.end;
+    }
+    return tag_range_.begin;
+}
+
+std::vector<BatchContextPtr> QueueBatchContext::ResolveSubmitWaits(vvl::span<const SemaphoreSubmitInfo> wait_infos,
+                                                                   std::vector<SemaphoreSubmitInfo>& unresolved_waits,
+                                                                   SignalsUpdate& signals_update) {
+    std::vector<BatchContextPtr> resolved_batches;
+    for (const auto& wait_info : wait_infos) {
+        // Binary semaphore wait:
+        // * There must be a single resovling signal. If no signal is found, it is a validation error.
+        // * The resolving signal must not depend on another not yet submitted timeline signal. That's
+        //   not allowed by the specification. When this happens OnBinaryWait also reports that signal
+        //   not found.
+        // Timeline semaphore wait:
+        // * No resolving signal is allowed. It is a wait-before-signal scenario.
+        // * A single resolving signal. The specification defines that exactly *one* signal resolves the wait.
+        //   If there are multiple signals that meet the waiting criteria then implementation may choose
+        //   any of them (which one is unspecified). This also means that a single timeline wait cannot
+        //   synchronize accesses from multiple queues even if each queue has matching signal.
+        std::optional<SignalInfo> resolving_signal;
+
+        if (wait_info.type == VK_SEMAPHORE_TYPE_BINARY) {
+            resolving_signal = signals_update.OnBinaryWait(wait_info.semaphore);
+            if (!resolving_signal) {
+                // [core validation check]: binary signal not found or depends on not yet submitted timeline signal
+                continue;
+            }
+        } else {
+            // Special case when semaphore initial value satisfies the wait.
+            // There is no batch that signals initial value, nothing to resolve here.
+            if (wait_info.value <= wait_info.initial_value) {
+                continue;
+            }
+            resolving_signal = signals_update.OnTimelineWait(wait_info.semaphore, wait_info.value);
+
+            // Register wait-before-signal
+            if (!resolving_signal) {
+                if (!wait_info.is_external) {
+                    unresolved_waits.emplace_back(wait_info);
+                    continue;
+                } else {
+                    // Do not register wait-before-signal for external semaphore.
+                    // We might not be able to track the signal. Just assume that wait is satified.
+                    continue;
+                }
+            }
+        }
+        if (resolving_signal->batch) {
+            ResolveSubmitSemaphoreWait(resolving_signal.value(), wait_info.stage_mask);
+            ImportTags(*resolving_signal->batch);
+            resolved_batches.emplace_back(std::move(resolving_signal->batch));
+        }
+    }
+    return resolved_batches;
+}
+
+bool QueueBatchContext::ValidateSubmit(vvl::span<const CommandBufferRecordingPtr> recordings, uint64_t submit_index,
+                                       uint32_t batch_index, std::vector<std::string>& current_label_stack,
+                                       const Location& submit_loc) {
+    bool skip = false;
+
+    BatchInfo batch{queue_state_, submit_index, batch_index};
+    uint32_t tag_count = 0;
+    for (const CommandBufferRecordingPtr& recording : recordings) {
+        if (!recording) continue;
+        tag_count += static_cast<uint32_t>(recording->GetTagCount());
+    }
+    batch.base_tag = SetupBatchTags(tag_count);
+
+    for (uint32_t index = 0; index < (uint32_t)recordings.size(); index++) {
+        const CommandBufferRecordingPtr& recording = recordings[index];
+        if (!recording) {
+            continue;
+        }
+        // Validate and resolve command buffers that have tagged commands
+        if (recording->GetTagCount() > 0) {
+            const Location submit_info_loc = submit_loc.dot(vvl::Field::pSubmits, batch_index);
+            const Location cb_loc = submit_loc.function == vvl::Func::vkQueueSubmit
+                                        ? submit_info_loc.dot(vvl::Field::pCommandBuffers, index)
+                                        : submit_info_loc.dot(vvl::Field::pCommandBufferInfos, index);
+
+            batch_log_.Import(batch, recording, current_label_stack);
+
+            skip |= ReplayCommands(GetSyncEnvironment(), GetAccessContext(), *recording, batch.base_tag, cb_loc);
+            batch.base_tag += recording->GetTagCount();
+        }
+        // Apply debug label commands
+        vvl::CommandBuffer::ReplayLabelCommands(recording->label_commands, current_label_stack);
+    }
+    return skip;
+}
+
+ResourceUsageInfo QueueBatchContext::GetResourceUsageInfo(ResourceUsageTagEx tag_ex) const {
+    return batch_log_.GetResourceUsageInfo(tag_ex);
+}
+
+std::vector<BatchContextPtr> SyncValidator::GetLastBatches(std::function<bool(const BatchContextPtr&)> filter) const {
+    std::vector<BatchContextPtr> snapshot;
+    for (const QueueState& queue_state : queue_states_) {
+        auto batch = queue_state.LastBatch();
+        if (batch && filter(batch)) {
+            snapshot.emplace_back(std::move(batch));
+        }
+    }
+    return snapshot;
+}
+
+const LastSynchronizedPresent& QueueState::GetLastSynchronizedPresent() const {
+    static const LastSynchronizedPresent empty;
+    return last_batch_ ? last_batch_->last_synchronized_present : empty;
+}
+
+void QueueState::SetLastBatch(BatchContextPtr&& last) {
+    if (last) {
+        // Clean up the events data in the previous last batch on queue, as only the subsequent
+        // batches have valid use for them and the QueueBatchContext::Setup calls have be copying
+        // them along from batch to batch during submit.
+        if (last_batch_) {
+            last_batch_->ResetEventsContext();
+        }
+        last->Trim();
+        last_batch_ = std::move(last);
+    }
+}
+
+void BatchLog::Import(const BatchInfo& batch, const CommandBufferRecordingPtr& recording,
+                      const std::vector<std::string>& initial_label_stack) {
+    CommandBufferLog log;
+    log.batch = batch;
+    log.recording = recording;
+    log.initial_label_stack = initial_label_stack;
+
+    ResourceUsageRange import_range = {batch.base_tag, batch.base_tag + recording->GetTagCount()};
+    log_map_.insert(std::make_pair(import_range, LogEntry(std::move(log))));
+}
+
+void BatchLog::Import(const BatchLog& other) {
+    for (const auto& entry : other.log_map_) {
+        log_map_.insert(entry);
+    }
+}
+
+void BatchLog::Insert(const ResourceUsageRange& range, SwapchainOpLog&& log) {
+    log_map_.insert(std::make_pair(range, LogEntry(std::move(log))));
+}
+
+// Trim: Remove any unreferenced log entries from a BatchLog
+//
+// In order to contain memory growth from the recordings of prior submitted command buffers,
+// the Trim call removes any log entries that do not correspond to any tags in use. The set of referenced tags, used_tags,
+// is generated by scanning the AccessContext and EventContext of the containing QueueBatchContext.
+//
+// Upon return the BatchLog should only contain the entries needed by the containing parent QueueBatchContext.
+//
+// The algorithm used is another example of the "parallel iteration" pattern common within SyncVal.  In this case we are
+// traversing the ordered range_map containing the log entries and the ordered set of tags in use.
+//
+// To efficiently perform the parallel iteration, optimizations within this function include:
+//  * when ranges are detected that have no tags referenced, all ranges between the last tag and the current tag are erased
+//  * when used tags prior to the current range are found, all tags up to the current range are skipped
+//  * when a tag is found within the current range, that range is skipped (and thus kept in the map), and further used tags
+//    within the range are skipped.
+//
+// Note that for each subcase, any "next steps" logic is designed to be handled within the subsequent iteration -- meaning that
+// each subcase simply handles the specifics of the current update/skip/erase action needed, and leaves the iterators in a sensible
+// state for the top of loop... intentionally eliding special case handling.
+void BatchLog::Trim(const ResourceUsageTagSet& used_tags) {
+    auto current_tag = used_tags.cbegin();
+    const auto end_tag = used_tags.cend();
+    auto current_map_range = log_map_.begin();
+    const auto end_map = log_map_.end();
+
+    while (current_map_range != end_map) {
+        if (current_tag == end_tag) {
+            // We're out of tags, the rest of the map isn't referenced, so erase it
+            current_map_range = log_map_.erase(current_map_range, end_map);
+        } else {
+            auto& range = current_map_range->first;
+            const ResourceUsageTag tag = *current_tag;
+            if (tag < range.begin) {
+                // Skip to the next tag potentially in range
+                // if this is end_tag, we'll handle that next iteration
+                current_tag = used_tags.lower_bound(range.begin);
+            } else if (tag >= range.end) {
+                // This tag is beyond the current range, delete all ranges between current_map_range,
+                // and the next that includes the tag.  Next is not erased.
+                auto next_used = log_map_.lower_bound(ResourceUsageRange(tag, tag + 1));
+                current_map_range = log_map_.erase(current_map_range, next_used);
+            } else {
+                // Skip the rest of the tags in this range
+                // If this is end, the next iteration will handle
+                current_tag = used_tags.lower_bound(range.end);
+
+                // This is a range we will keep, advance to the next. Next iteration handles end condition
+                ++current_map_range;
+            }
+        }
+    }
+}
+
+ResourceUsageInfo BatchLog::GetResourceUsageInfo(ResourceUsageTagEx tag_ex) const {
+    auto found_log = log_map_.find(tag_ex.tag);
+    assert(found_log != log_map_.cend());
+
+    ResourceUsageInfo info;
+    const BatchInfo* batch = nullptr;
+    if (const CommandBufferLog* cb_log = std::get_if<CommandBufferLog>(&found_log->second)) {
+        assert(tag_ex.tag >= cb_log->batch.base_tag);
+        const ResourceUsageTagEx local_tag_ex{tag_ex.tag - cb_log->batch.base_tag, tag_ex.handle_index};
+        info = cb_log->recording->GetResourceUsageInfo(local_tag_ex, cb_log);
+        batch = &cb_log->batch;
+    } else {
+        const SwapchainOpLog& swapchain_log = *std::get_if<SwapchainOpLog>(&found_log->second);
+        const uint32_t index = static_cast<uint32_t>(tag_ex.tag - swapchain_log.batch.base_tag);
+        info.command = swapchain_log.ops[index].command;
+        batch = &swapchain_log.batch;
+    }
+    if (batch->queue_state) {
+        info.queue = batch->queue_state->GetQueue();
+        info.submit_index = batch->submit_index;
+        info.batch_index = batch->batch_index;
+        info.batch_base_tag = batch->base_tag;
+    }
+    return info;
+}
+
+VkSwapchainKHR BatchLog::GetPresentSwapchain(ResourceUsageTag tag) const {
+    auto found_log = log_map_.find(tag);
+    assert(found_log != log_map_.cend());
+
+    const SwapchainOpLog* swapchain_log = std::get_if<SwapchainOpLog>(&found_log->second);
+    assert(swapchain_log);
+
+    const uint32_t index = static_cast<uint32_t>(tag - swapchain_log->batch.base_tag);
+    const SwapchainOp& op = swapchain_log->ops[index];
+    assert(op.command == vvl::Func::vkQueuePresentKHR);
+    return op.swapchain;
+}
+
+std::string CommandBufferLog::GetDebugRegionName(const ResourceUsageRecord& record) const {
+    const auto& label_commands = recording->label_commands;
+    return vvl::CommandBuffer::GetDebugRegionName(label_commands, record.label_command_index, initial_label_stack);
+}
+
+PresentedImage::PresentedImage(const std::shared_ptr<const vvl::Image>& image_state, uint32_t at_index) : PresentedImage() {
+    tag = kInvalidTag;
+    image_index = at_index;
+    image = image_state;
+    swapchain = image_state->create_from_swapchain;
+    range_gen = SubState(*image).MakeImageRangeGen(image->full_range, false);
+}
+
+void PresentedImage::UpdateMemoryAccess(SyncAccessIndex usage, ResourceUsageTag tag, AccessContext& access_context,
+                                        SyncFlags flags) const {
+    ImageRangeGen mutable_range_gen = range_gen;
+    access_context.UpdateAccessState(mutable_range_gen, usage, ResourceUsageTagEx{tag}, flags);
+}
+
+}  // namespace syncval
