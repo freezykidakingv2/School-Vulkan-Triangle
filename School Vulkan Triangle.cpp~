@@ -107,6 +107,7 @@ private:
         createLogicalDevice();
 	createSwapChain();
 	createImageViews();
+	createGraphicsPipeline();
     }
 
 SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
@@ -265,6 +266,10 @@ VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
 			throw std::runtime_error("failed to create image views!"); 
 		}
 	}
+    }
+
+    void createGraphicsPipeline() {
+
     }
 
     void mainLoop() {
