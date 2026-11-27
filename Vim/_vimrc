@@ -59,6 +59,14 @@ source C:/Users/Student/Documents/School-Vulkan-Triangle-main/vimfiles/pack/plug
 if executable('clangd')
 	    au User lsp_setup call lsp#register_server({
 		            \ 'name': 'clangd',
+			            \ 'cmd': {server_info->['clangd']},
+				            \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp'],
+					            \ })
+endif
+
+if executable('clangd')
+	    call lsp#register_server({
+		            \ 'name': 'clangd',
 			            \ 'cmd': {server_info->[
 				            \     'clangd',
 					            \     '--query-driver=C:/Users/Student/Documents/School-Vulkan-Triangle-main/bin/g++.exe'
